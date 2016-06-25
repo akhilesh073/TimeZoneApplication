@@ -1,14 +1,9 @@
 package com.akh.service;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -19,7 +14,7 @@ public class TimeZoneServiceImpl {
 	public static void getAvailableTimeZines() {
 		String[] ids = TimeZone.getAvailableIDs();
 		
-		//Taking the first 10 timeZones for testing purouse
+		//Taking the first 10 timeZones for testing purpose
 		int count=0;
 		for (String id : ids) {
 			count++;
@@ -57,20 +52,6 @@ public class TimeZoneServiceImpl {
 		availableTimezones.put(tz.getID(), result);
 	}
 
-	public static void main(String[] args) {
-		getAvailableTimeZines();
-
-		printMap(availableTimezones);
-	}
-
-	private static void printMap(Map<String, String> availableTimezones2) {
-		Set<Entry<String, String>> hmSet = availableTimezones2.entrySet();
-		Iterator<Entry<String, String>> it = hmSet.iterator();
-		while (it.hasNext()) {
-			Map.Entry<String, String> entry = (Entry<String, String>) it.next();
-			System.out.println(entry.getKey() + "  :  " + entry.getValue());
-		}
-	}
 	public void setZone(String zoneName, String offset) {
 		availableTimezones.put(zoneName, offset);
 	}
