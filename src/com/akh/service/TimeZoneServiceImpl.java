@@ -1,6 +1,6 @@
 package com.akh.service;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,27 +13,38 @@ public class TimeZoneServiceImpl {
 
 	public static void getAvailableTimeZines() {
 		String[] ids = TimeZone.getAvailableIDs();
-		
-		//Taking the first 10 timeZones for testing purpose
-		int count=0;
 		for (String id : ids) {
-			count++;
 			setTimeZoneToMap(TimeZone.getTimeZone(id));
-			if(count==10){
-				break;
-			}
 		}
 
 	}
 	public Map<String,String> getTimeZone(String[] requests){
 		Map<String,String> timeZones=new HashMap<String,String>();
 		for(String zone:requests){
-			Date date = new Date();
-			DateFormat df = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss a");
-			df.setTimeZone(TimeZone.getTimeZone(zone));
-			timeZones.put(zone,df.format(date));				
+			String tZoffset= availableTimezones.get(zone);
+			int offset=Integer.valueOf(tZoffset.replace("GMT","").trim());
+			String time=getTimeZoneFromOffset(offset);
+			timeZones.put(zone,time);
 		}
 		return timeZones;
+	}
+	
+	public static String getTimeZoneFromOffset(int offset) {
+		Calendar c = Calendar.getInstance();
+		TimeZone z = c.getTimeZone();
+		int tzoffset = z.getOffset(c.getTimeInMillis()) / 1000 / 60;
+		offset = offset - tzoffset;
+		if (z.inDaylightTime(new Date())) {
+			offset = offset + z.getDSTSavings();
+		}
+		int offsetHrs = offset / 60;
+		int offsetMins = offset % 60;
+
+		c.add(Calendar.HOUR_OF_DAY, (offsetHrs));
+		c.add(Calendar.MINUTE, (offsetMins));
+
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss a");
+		return sdf.format(c.getTime());
 	}
 	
 
@@ -43,11 +54,12 @@ public class TimeZoneServiceImpl {
 		long minutes = TimeUnit.MILLISECONDS.toMinutes(tz.getRawOffset())
 				- TimeUnit.HOURS.toMinutes(hours);
 		minutes = Math.abs(minutes);
+		long offset=hours*60+minutes;
 		String result = "";
 		if (hours > 0) {
-			result = String.format("GMT+%d:%02d", hours, minutes);
+			result = String.format("GMT+%3d", offset);
 		} else {
-			result = String.format("GMT%d:%02d", hours, minutes);
+			result = String.format("GMT%3d", offset);
 		}
 		availableTimezones.put(tz.getID(), result);
 	}
