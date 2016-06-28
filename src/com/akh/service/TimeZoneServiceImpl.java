@@ -13,8 +13,15 @@ public class TimeZoneServiceImpl {
 
 	public static void getAvailableTimeZines() {
 		String[] ids = TimeZone.getAvailableIDs();
+
+		// Taking the first 10 timeZones for testing purouse
+		int count = 0;
 		for (String id : ids) {
+			count++;
 			setTimeZoneToMap(TimeZone.getTimeZone(id));
+			if (count == 10) {
+				break;
+			}
 		}
 
 	}
